@@ -6,7 +6,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const API_KEY = "AIzaSyCHSwpO_q8drvdxLq450W8AMQO7IiSy1nw";
+const API_KEY = process.env.GEMINI_API_KEY;
+
 
 app.post("/analyze-text", async (req, res) => {
   try {
