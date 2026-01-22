@@ -12,83 +12,67 @@ export default function ResultScreen({
   onScanAnother,
   onChangeProfile,
 }) {
-  const theme =
-    verdict === "SAFE"
-      ? "from-emerald-200/70 to-emerald-100/60 border-emerald-400 text-emerald-900"
-      : verdict === "CAUTION"
-      ? "from-amber-200/70 to-amber-100/60 border-amber-400 text-amber-900"
-      : "from-rose-200/70 to-rose-100/60 border-rose-400 text-rose-900";
+  // Safety guards (prevent black screen)
+  const safeVerdict = verdict ? verdict.toUpperCase() : "CAUTION";
+  const safeRisk = riskLevel || "Low";
+  const safeKey = keyIngredient || "Unknown";
+  const safeExplain = explanation || "No explanation available.";
+  const safeIngredients = ingredients || "No ingredients found.";
 
-  const icon =
-    verdict === "SAFE" ? "✔️" : verdict === "CAUTION" ? "⚠️" : "⛔";
+  const theme =
+    safeVerdict === "SAFE"
+      ? "bg-emerald-100 border-emerald-300 text-emerald-800"
+      : safeVerdict === "CAUTION"
+      ? "bg-yellow-100 border-yellow-300 text-yellow-800"
+      : "bg-red-100 border-red-300 text-red-800";
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6">
 
-      {/* VERDICT CARD */}
-      <div
-        className={`bg-gradient-to-br ${theme} backdrop-blur-2xl
-                    border rounded-3xl shadow-xl p-6 text-center`}
-      >
-        <div className="text-5xl mb-2">{icon}</div>
-        <h2 className="text-2xl font-extrabold tracking-wide">{verdict}</h2>
-        <p className="text-sm opacity-80 mt-1">
-          Risk Level: <span className="font-semibold">{riskLevel}</span>
-        </p>
+      {/* Verdict */}
+      <div className={`p-4 rounded-xl border ${theme} text-center`}>
+        <h2 className="text-xl font-bold">{safeVerdict}</h2>
+        <p className="text-sm">Risk Level: {safeRisk}</p>
       </div>
 
-      {/* KEY INGREDIENT */}
-      <div className="bg-white/50 backdrop-blur-2xl rounded-2xl 
-                      border border-emerald-200/60 p-5 shadow-md">
-        <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">
+      {/* Key Ingredient */}
+      <div className="p-4 rounded-xl bg-white/70 border border-emerald-200">
+        <h3 className="text-sm font-semibold text-emerald-700 mb-1">
           Key Ingredient
         </h3>
-        <p className="text-emerald-900 font-medium">
-          {keyIngredient || "None"}
-        </p>
+        <p>{safeKey}</p>
       </div>
 
-      {/* EXPLANATION */}
-      <div className="bg-white/50 backdrop-blur-2xl rounded-2xl 
-                      border border-emerald-200/60 p-5 shadow-md">
-        <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">
+      {/* Explanation */}
+      <div className="p-4 rounded-xl bg-white/70 border border-emerald-200">
+        <h3 className="text-sm font-semibold text-emerald-700 mb-1">
           Medical Explanation
         </h3>
-        <p className="text-sm text-emerald-900 leading-relaxed">
-          {explanation}
-        </p>
+        <p className="text-sm">{safeExplain}</p>
       </div>
 
-      {/* INGREDIENTS */}
-      <div className="bg-white/40 backdrop-blur-2xl rounded-2xl 
-                      border border-emerald-200/60 p-5 shadow-inner">
-        <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">
+      {/* Ingredients */}
+      <div className="p-4 rounded-xl bg-white/70 border border-emerald-200">
+        <h3 className="text-sm font-semibold text-emerald-700 mb-1">
           Ingredient List
         </h3>
-        <p className="text-xs text-emerald-900 whitespace-pre-wrap">
-          {ingredients}
-        </p>
+        <p className="text-xs whitespace-pre-wrap">{safeIngredients}</p>
       </div>
 
-      {/* ACTIONS */}
+      {/* Actions */}
       <div className="space-y-3">
         <button
           onClick={onScanAnother}
-          className="w-full py-4 rounded-2xl font-semibold text-white
-                     bg-gradient-to-r from-emerald-600 to-teal-600
-                     shadow-lg shadow-emerald-300/40
-                     transition-all duration-300
-                     hover:scale-[1.02] hover:shadow-emerald-400/60"
+          className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold"
         >
-          {t.scanAnother}
+          {t.scanAnother || "Scan Another"}
         </button>
 
         <button
           onClick={onChangeProfile}
-          className="w-full text-emerald-700 hover:text-emerald-900 
-                     text-sm py-2 transition-colors"
+          className="w-full py-2 text-emerald-700 text-sm"
         >
-          {t.changeProfile}
+          {t.changeProfile || "Change Profile"}
         </button>
       </div>
     </div>
