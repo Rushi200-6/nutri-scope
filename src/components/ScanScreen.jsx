@@ -10,25 +10,31 @@ export default function ScanScreen({
     <div className="space-y-6 animate-fade-in">
       {/* HEADER */}
       <div className="text-center space-y-2 mb-6">
-        <h2 className="text-2xl font-bold tracking-tight text-white">
+        <h2 className="text-2xl font-bold tracking-tight text-emerald-900">
           {t.scanTitle}
         </h2>
-        <p className="text-sm text-slate-400">{t.scanSubtitle}</p>
+        <p className="text-sm text-emerald-800/70">{t.scanSubtitle}</p>
       </div>
 
-      {/* SCANNER CARD */}
-      <div className="relative bg-slate-900/50 backdrop-blur-xl rounded-2xl border-2 border-slate-800 p-4 shadow-2xl">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-600/10 to-transparent pointer-events-none"></div>
+      {/* SCANNER GLASS CARD */}
+      <div className="relative rounded-3xl p-3 bg-white/30 backdrop-blur-2xl border border-white/40 shadow-2xl overflow-hidden">
 
-        <div className="relative h-72 rounded-xl overflow-hidden bg-black border border-slate-700 shadow-inner">
+        {/* Animated Scan Line */}
+        <div className="absolute inset-x-0 top-0 h-1 bg-emerald-400/70 animate-scanline"></div>
+
+        {/* Glow Border */}
+        <div className="absolute inset-0 rounded-3xl ring-2 ring-emerald-300/40 shadow-[0_0_40px_rgba(16,185,129,0.35)] pointer-events-none"></div>
+
+        {/* Camera Frame */}
+        <div className="relative h-72 rounded-2xl overflow-hidden bg-black border border-emerald-300/40 shadow-inner">
           <BarcodeScanner onDetected={onDetected} />
         </div>
 
         {/* ACTIVE BADGE */}
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-slate-950/80 backdrop-blur-sm rounded-full border border-slate-700">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-white/60 backdrop-blur rounded-full border border-emerald-300/40 shadow-md">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-xs font-medium text-slate-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs font-semibold text-emerald-900">
               {t.scannerActive}
             </span>
           </div>
@@ -36,7 +42,7 @@ export default function ScanScreen({
       </div>
 
       {/* HELP TEXT */}
-      <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+      <div className="flex items-center justify-between px-1 text-xs text-emerald-800/70">
         <span>{t.barcodeTypes}</span>
         <span>{t.optimalLight}</span>
       </div>
@@ -45,18 +51,35 @@ export default function ScanScreen({
       <div className="space-y-3">
         <button
           onClick={onManualEntry}
-          className="w-full bg-slate-800/60 hover:bg-slate-800 border border-slate-700 py-3.5 rounded-xl font-medium text-white transition-all duration-200"
+          className="w-full py-3.5 rounded-xl bg-white/40 backdrop-blur border border-white/50
+                     text-emerald-900 font-medium shadow-lg
+                     hover:shadow-emerald-300/60 hover:scale-[1.02]
+                     transition-all duration-300"
         >
           {t.manualEntry}
         </button>
 
         <button
           onClick={onChangeProfile}
-          className="w-full text-slate-500 hover:text-slate-400 text-sm py-2 transition-colors"
+          className="w-full text-emerald-800 hover:text-emerald-900 text-sm py-2 transition-colors"
         >
           {t.changeProfile}
         </button>
       </div>
+
+      {/* Scanline animation */}
+      <style>
+        {`
+          @keyframes scanline {
+            0% { transform: translateY(0); opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { transform: translateY(280px); opacity: 0.2; }
+          }
+          .animate-scanline {
+            animation: scanline 2.5s linear infinite;
+          }
+        `}
+      </style>
     </div>
   );
 }
