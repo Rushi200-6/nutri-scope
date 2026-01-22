@@ -18,7 +18,6 @@ export default function App() {
   const [step, setStep] = useState("home");
   const [mode, setMode] = useState(null);
 
-  const [profile, setProfile] = useState("");
   const [selectedAllergies, setSelectedAllergies] = useState([]);
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -72,10 +71,10 @@ export default function App() {
 
     setBarcode(code);
     setScanSuccess(true);
-    setTimeout(() => setScanSuccess(false), 1500);
+    setTimeout(() => setScanSuccess(false), 1200);
 
     setIsLoading(true);
-    setLoadingMessage(t.scanningDb || "Scanning...");
+    setLoadingMessage(t.scanningDb || "Scanning product...");
     resetProductFlow();
 
     try {
@@ -106,19 +105,22 @@ export default function App() {
   const fetchIngredientsOnline = async (name, variantInput) => {
     try {
       setIsLoading(true);
-      setLoadingMessage(t.aiSearching || "AI Searching...");
+      setLoadingMessage(t.aiSearching || "Searching ingredients...");
+
       const fullName = variantInput ? `${name} ${variantInput}` : name;
       setProductName(fullName);
 
       const text = await callGemini(
-        `Return comma-separated ingredients for "${fullName}".`
+        `Return only a comma-separated ingredient list for the product "${fullName}".`
       );
+
+      if (!text) throw new Error("No AI response");
 
       setIngredients(text);
       setStep("confirm");
     } catch (e) {
       console.error("Manual search failed:", e);
-      setInfoMessage("Network issue. Please try again.");
+      setInfoMessage("AI service unavailable. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -126,25 +128,46 @@ export default function App() {
 
   const analyzeSafety = async () => {
     setIsLoading(true);
-    setLoadingMessage(t.analyzing || "Analyzing...");
+    setLoadingMessage(t.analyzing || "Analyzing safety...");
 
     try {
-      const text = await callGemini("Analyze product safety.");
+      const prompt = `
+Analyze this food product strictly and return JSON only.
+
+Product: ${productName}
+Ingredients: ${ingredients}
+Allergies: ${selectedAllergies.join(", ") || "None"}
+Height: ${height || "N/A"}
+Weight: ${weight || "N/A"}
+
+Return:
+{
+  "verdict": "SAFE" | "CAUTION" | "UNSAFE",
+  "risk_level": "Low" | "Medium" | "High",
+  "key_ingredient": "ingredient or None",
+  "explanation": "short medical explanation"
+}
+`;
+
+      const text = await callGemini(prompt);
       const clean = text.replace(/```json|```/g, "").trim();
       const match = clean.match(/\{[\s\S]*\}/);
-      const json = match ? JSON.parse(match[0]) : {};
 
-      setVerdict((json.verdict || "CAUTION").toUpperCase());
+      if (!match) throw new Error("Invalid JSON");
+
+      const json = JSON.parse(match[0]);
+
+      setVerdict(json.verdict || "CAUTION");
       setRiskLevel(json.risk_level || "Low");
       setKeyIngredient(json.key_ingredient || "Unknown");
-      setExplanation(json.explanation || "AI unavailable. Showing fallback result.");
+      setExplanation(json.explanation || "AI response incomplete.");
       setStep("result");
     } catch (e) {
-      console.error("Analysis crash prevented:", e);
+      console.error("AI analysis failed:", e);
       setVerdict("CAUTION");
       setRiskLevel("Low");
       setKeyIngredient("Unknown");
-      setExplanation("Service temporarily unavailable.");
+      setExplanation("AI service temporarily unavailable. Showing safe fallback.");
       setStep("result");
     } finally {
       setIsLoading(false);
@@ -152,16 +175,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden
-                    bg-gradient-to-br from-emerald-100 via-teal-100 to-green-100">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden
+                    bg-gradient-to-br from-emerald-100/80 via-teal-100/70 to-green-100/80">
 
-      {/* Soft glow blobs */}
-      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-emerald-300/40 rounded-full blur-[140px]"></div>
-      <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-teal-300/40 rounded-full blur-[140px]"></div>
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-300/45 rounded-full blur-3xl"></div>
+      <div className="absolute top-1/2 -right-40 w-96 h-96 bg-teal-300/45 rounded-full blur-3xl"></div>
 
-      <div className="relative w-full max-w-md bg-white/35 backdrop-blur-xl
-                      rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.25)]
-                      border border-white/40 p-6">
+      <div className="relative w-full max-w-md bg-white/30 backdrop-blur-2xl
+                      rounded-3xl shadow-2xl border border-white/45 p-6">
 
         {step !== "scan" && step !== "manual" && (
           <div className="absolute top-4 right-4 z-20">
