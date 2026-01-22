@@ -38,11 +38,13 @@ export default function ProfileScreen({
     (mode === "bmi+allergy" && height && weight);
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-[fadeInUp_0.6s_ease-out]">
 
       {/* HEADER */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-emerald-900">{t.title}</h1>
+        <h1 className="text-3xl font-bold text-emerald-900 drop-shadow-sm">
+          {t.title}
+        </h1>
         <p className="text-sm text-emerald-700/80">{t.subtitle}</p>
       </div>
 
@@ -53,25 +55,28 @@ export default function ProfileScreen({
         </h3>
 
         <div className="grid grid-cols-2 gap-3">
-          {profiles.map((p) => (
-            <button
-              key={p.value}
-              onClick={() => toggleAllergy(p.value)}
-              className={`px-4 py-3 rounded-2xl border backdrop-blur-xl transition-all duration-300
-                ${
-                  selectedAllergies.includes(p.value)
-                    ? "bg-emerald-200/40 border-emerald-400 shadow-lg shadow-emerald-300/40 scale-[1.02]"
-                    : "bg-white/30 border-white/40 hover:border-emerald-300 hover:shadow-md"
+          {profiles.map((p) => {
+            const active = selectedAllergies.includes(p.value);
+            return (
+              <button
+                key={p.value}
+                onClick={() => toggleAllergy(p.value)}
+                className={`px-4 py-3 rounded-2xl border backdrop-blur-xl transition-all duration-300
+                transform
+                ${active
+                  ? "bg-emerald-200/40 border-emerald-400 shadow-lg shadow-emerald-300/50 scale-[1.03]"
+                  : "bg-white/30 border-white/40 hover:border-emerald-300 hover:shadow-md hover:scale-[1.02]"
                 }`}
-            >
-              <div className="font-medium text-emerald-900">
-                {t.profiles[p.value].label}
-              </div>
-              <div className="text-xs text-emerald-700">
-                {t.profiles[p.value].desc}
-              </div>
-            </button>
-          ))}
+              >
+                <div className="font-medium text-emerald-900">
+                  {t.profiles[p.value].label}
+                </div>
+                <div className="text-xs text-emerald-700">
+                  {t.profiles[p.value].desc}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -85,12 +90,16 @@ export default function ProfileScreen({
             value={customAllergy}
             onChange={(e) => setCustomAllergy(e.target.value)}
             placeholder="e.g. Sesame, Shellfish"
-            className="flex-1 bg-white/40 backdrop-blur border border-white/50 rounded-xl px-3 py-2 text-emerald-900 placeholder-emerald-500 focus:ring-2 focus:ring-emerald-400 outline-none"
+            className="flex-1 bg-white/40 backdrop-blur border border-white/50 rounded-xl px-3 py-2 
+                       text-emerald-900 placeholder-emerald-500
+                       focus:ring-2 focus:ring-emerald-400 focus:scale-[1.02]
+                       transition-all outline-none"
           />
 
           <button
             onClick={addCustomAllergy}
-            className="px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium shadow-lg shadow-emerald-400/40 transition"
+            className="px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium
+                       shadow-lg shadow-emerald-400/40 hover:scale-105 transition-all"
           >
             Add
           </button>
@@ -99,11 +108,13 @@ export default function ProfileScreen({
 
       {/* SELECTED TAGS */}
       {selectedAllergies.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 animate-[fadeIn_0.4s_ease-out]">
           {selectedAllergies.map((a) => (
             <span
               key={a}
-              className="px-3 py-1 rounded-full bg-emerald-200/40 border border-emerald-400/40 text-xs text-emerald-900 shadow"
+              className="px-3 py-1 rounded-full bg-emerald-200/40 border border-emerald-400/40
+                         text-xs text-emerald-900 shadow
+                         animate-[pop_0.3s_ease-out]"
             >
               {a}
             </span>
@@ -113,21 +124,24 @@ export default function ProfileScreen({
 
       {/* BMI INPUTS */}
       {mode === "bmi" && (
-        <div className="bg-white/30 backdrop-blur-xl border border-white/40 rounded-2xl p-4 space-y-4">
+        <div className="bg-white/30 backdrop-blur-xl border border-white/40 rounded-2xl p-4 space-y-4
+                        animate-[fadeIn_0.5s_ease-out]">
           <div className="grid grid-cols-2 gap-4">
             <input
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               placeholder="Height (cm)"
-              className="bg-white/40 border border-white/50 rounded-xl px-3 py-2 text-emerald-900"
+              className="bg-white/40 border border-white/50 rounded-xl px-3 py-2 text-emerald-900
+                         focus:ring-2 focus:ring-emerald-400 transition-all"
             />
             <input
               type="number"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="Weight (kg)"
-              className="bg-white/40 border border-white/50 rounded-xl px-3 py-2 text-emerald-900"
+              className="bg-white/40 border border-white/50 rounded-xl px-3 py-2 text-emerald-900
+                         focus:ring-2 focus:ring-emerald-400 transition-all"
             />
           </div>
         </div>
@@ -140,7 +154,8 @@ export default function ProfileScreen({
         className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500
                    disabled:from-slate-300 disabled:to-slate-300
                    font-semibold text-white shadow-xl shadow-emerald-400/40
-                   hover:scale-[1.02] transition-all duration-300 disabled:opacity-50"
+                   hover:scale-[1.03] active:scale-[0.98]
+                   transition-all duration-300 disabled:opacity-50"
       >
         {t.continue}
       </button>
